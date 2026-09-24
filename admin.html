@@ -5,6 +5,12 @@
     <link rel="icon" type="image/jpeg" href="assets/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quản Lý Thu Chi - Thêm Giao Dịch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300..900;1,300..900&display=swap"
+      rel="stylesheet"
+    />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -22,7 +28,7 @@
         box-sizing: border-box;
         margin: 0;
         padding: 0;
-        font-family: "Mulish", sans-serif;
+        font-family: Mulish, sans-serif;
       }
       body {
         background-color: var(--bg-color);
@@ -181,7 +187,7 @@
             placeholder="ghp_xxxxxxxxxxxxxxxxx"
           />
           <p class="file-hint">
-            Token sẽ được lưu an toàn trong localStorage trên máy này.
+            Token sẽ được lưu an toàn trong localStorage trên trình duyệt này.
           </p>
         </div>
         <button
@@ -216,6 +222,19 @@
             </div>
           </div>
 
+          <!-- Ô nhập Mã Giao Dịch / ID tùy chọn -->
+          <div class="form-group">
+            <label>Mã giao dịch / ID (Ví dụ từ ZaloPay):</label>
+            <input
+              type="text"
+              id="customId"
+              placeholder="Ví dụ: 260924-004851991 (Nơi dán mã ZaloPay)"
+            />
+            <p class="file-hint">
+              Nếu để trống, hệ thống sẽ tự sinh ID theo ngày giờ.
+            </p>
+          </div>
+
           <div class="form-group">
             <label>Tiêu đề khoản thu/chi (*):</label>
             <input
@@ -245,7 +264,7 @@
             <label>Nội dung chi tiết:</label>
             <textarea
               id="content"
-              placeholder="Ví dụ: Phụ huynh NGUYEN VAN A đã gửi tiền vào quỹ lớp."
+              placeholder="Ví dụ: Phụ huynh NGUYEN VAN A đã gửi tiền vào quỹ."
             ></textarea>
           </div>
 
@@ -273,7 +292,7 @@
     <script>
       let selectedType = "thu";
 
-      // 1. Khởi tạo cấu hình và thời gian mặc định
+      // 1. Khởi tạo cấu hình và thiết lập thời gian địa phương
       document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("ghOwner").value =
           localStorage.getItem("gh_owner") || "";
@@ -282,12 +301,16 @@
         document.getElementById("ghToken").value =
           localStorage.getItem("gh_token") || "";
 
-        // Set thời gian hiện tại
+        // Set thời gian hiện tại chuẩn theo múi giờ địa phương (Local Time)
         const now = new Date();
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        document.getElementById("datetime").value = now
-          .toISOString()
-          .slice(0, 16);
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        const day = String(now.getDate()).padStart(2, "0");
+        const hours = String(now.getHours()).padStart(2, "0");
+        const minutes = String(now.getMinutes()).padStart(2, "0");
+
+        document.getElementById("datetime").value =
+          `${year}-${month}-${day}T${hours}:${minutes}`;
       });
 
       function saveConfig() {
@@ -342,7 +365,6 @@
       ) {
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
 
-        // Kiểm tra xem file đã tồn tại chưa để lấy SHA (nếu ghi đè)
         let sha = null;
         try {
           const checkRes = await fetch(url, {
@@ -389,9 +411,10 @@
             return;
           }
 
+          const customId = document.getElementById("customId").value.trim();
           const title = document.getElementById("title").value.trim();
           const rawAmount = parseInt(document.getElementById("amount").value);
-          const datetimeInput = document.getElementById("datetime").value; // YYYY-MM-DDTHH:mm
+          const datetimeInput = document.getElementById("datetime").value; // Dạng: YYYY-MM-DDTHH:mm
           const content = document.getElementById("content").value.trim();
           const receiptFile = document.getElementById("receiptFile").files[0];
           const docFile = document.getElementById("docFile").files[0];
@@ -400,16 +423,23 @@
           submitBtn.disabled = true;
 
           try {
-            // Chuẩn hóa định dạng
-            const dt = new Date(datetimeInput);
-            const isoDatetime = dt.toISOString().slice(0, 19); // 2026-09-24T21:35:00
-            const yearMonth = isoDatetime.slice(0, 7); // 2026-09
+            // Giữ nguyên chuỗi Giờ địa phương, không dùng toISOString() để tránh lệch UTC
+            const isoDatetime =
+              datetimeInput.length === 16
+                ? `${datetimeInput}:00`
+                : datetimeInput;
+            const yearMonth = isoDatetime.slice(0, 7); // YYYY-MM
 
-            // Tạo ID dạng: 260924-102530
-            const dateStr = isoDatetime.slice(2, 10).replace(/-/g, "");
-            const timeStr = isoDatetime.slice(11, 19).replace(/:/g, "");
-            const id = `${dateStr}-${timeStr}`;
+            // Xác định ID giao dịch
+            let id = customId;
+            if (!id) {
+              const dateStr = isoDatetime.slice(2, 10).replace(/-/g, "");
+              const timeStr = isoDatetime.slice(11, 19).replace(/:/g, "");
+              id = `${dateStr}-${timeStr}`;
+            }
 
+            // Tên file an toàn (loại bỏ ký tự đặc biệt)
+            const safeFileId = id.replace(/[^a-zA-Z0-9_-]/g, "_");
             const formattedAmount = rawAmount.toLocaleString("vi-VN") + " VNĐ";
 
             let receiptUrl = "";
@@ -419,13 +449,13 @@
             if (receiptFile) {
               showStatus("info", "⏳ Đang tải ảnh biên lai lên GitHub...");
               const ext = receiptFile.name.split(".").pop();
-              const receiptPath = `assets/${yearMonth}/proof/${selectedType}-${id}.${ext}`;
+              const receiptPath = `assets/${yearMonth}/proof/${safeFileId}.${ext}`;
               const base64 = await fileToBase64(receiptFile);
 
               await uploadToGitHub(
                 receiptPath,
                 base64,
-                `Upload receipt ${id}`,
+                `Upload receipt #${id}`,
                 token,
                 owner,
                 repo,
@@ -437,13 +467,13 @@
             if (docFile) {
               showStatus("info", "⏳ Đang tải văn bản chỉ đạo lên GitHub...");
               const ext = docFile.name.split(".").pop();
-              const docPath = `assets/${yearMonth}/doc/${selectedType}-${id}.${ext}`;
+              const docPath = `assets/${yearMonth}/doc/${safeFileId}.${ext}`;
               const base64 = await fileToBase64(docFile);
 
               await uploadToGitHub(
                 docPath,
                 base64,
-                `Upload doc ${id}`,
+                `Upload doc #${id}`,
                 token,
                 owner,
                 repo,
@@ -452,7 +482,7 @@
             }
 
             // BƯỚC 3: Cập nhật file js/data.js
-            showStatus("info", "⏳ Đang lấy dữ liệu file js/data.js...");
+            showStatus("info", "⏳ Đang lấy dữ liệu tệp js/data.js...");
             const dataFileUrl = `https://api.github.com/repos/${owner}/${repo}/contents/js/data.js`;
             const dataRes = await fetch(dataFileUrl, {
               headers: { Authorization: `Bearer ${token}` },
@@ -462,9 +492,8 @@
               throw new Error("Không thể đọc tệp js/data.js từ GitHub");
 
             const dataJson = await dataRes.json();
-            const sha = dataJson.sha;
 
-            // Giải mã Base64 -> Chuỗi UTF-8
+            // Giải mã mã nguồn UTF-8 chuẩn
             const bytes = Uint8Array.from(
               atob(dataJson.content.replace(/\s/g, "")),
               (c) => c.charCodeAt(0),
@@ -477,7 +506,7 @@
             );
             if (!arrayMatch)
               throw new Error(
-                "Cấu trúc file js/data.js không đúng định dạng 'const transactionsData = [...]'",
+                "Cấu trúc tệp js/data.js không đúng định dạng 'const transactionsData = [...]'",
               );
 
             let transactions = eval(arrayMatch[1]);
@@ -494,21 +523,21 @@
             if (receiptUrl) newTransaction.receiptUrl = receiptUrl;
             if (pdfUrl) newTransaction.pdfUrl = pdfUrl;
 
-            // Chèn vào đầu mảng
+            // Chèn giao dịch mới vào đầu mảng
             transactions.unshift(newTransaction);
 
-            // Đóng gói lại chuỗi JS
-            const newJsContent = `const transactionsData = ${JSON.stringify(transactions, null, 4)};\n`;
+            // Định dạng lại tệp JS sạch sẽ (thụt lề 2 spaces chuẩn)
+            const newJsContent = `const transactionsData = ${JSON.stringify(transactions, null, 2)};\n`;
 
-            // Mã hóa chuỗi JS sang Base64 chuẩn UTF-8
+            // Mã hóa Base64 chuẩn UTF-8
             const encoder = new TextEncoder();
             const dataBytes = encoder.encode(newJsContent);
             let binaryStr = "";
             dataBytes.forEach((b) => (binaryStr += String.fromCharCode(b)));
             const newBase64 = btoa(binaryStr);
 
-            // Push đè lên file js/data.js
-            showStatus("info", "⏳ Đang cập nhật js/data.js...");
+            // Commit đè lên file js/data.js
+            showStatus("info", "⏳ Đang lưu tệp js/data.js...");
             await uploadToGitHub(
               "js/data.js",
               newBase64,
@@ -520,12 +549,22 @@
 
             showStatus(
               "success",
-              `🎉 **Thành công!** Đã thêm khoản ${selectedType === "thu" ? "Thu" : "Chi"} mã #${id}. Web sẽ cập nhật sau 20-30s.`,
+              `🎉 **Thành công!** Đã thêm giao dịch **#${id}**. Trang web sẽ tự động cập nhật sau 20-30 giây.`,
             );
 
-            // Reset form ngoại trừ thông tin GitHub
+            // Reset form (giữ nguyên cấu hình GitHub)
             document.getElementById("transactionForm").reset();
             selectType("thu");
+
+            // Cập nhật lại thời gian mặc định cho lượt nhập tiếp theo
+            const resetNow = new Date();
+            const rY = resetNow.getFullYear();
+            const rM = String(resetNow.getMonth() + 1).padStart(2, "0");
+            const rD = String(resetNow.getDate()).padStart(2, "0");
+            const rH = String(resetNow.getHours()).padStart(2, "0");
+            const rMin = String(resetNow.getMinutes()).padStart(2, "0");
+            document.getElementById("datetime").value =
+              `${rY}-${rM}-${rD}T${rH}:${rMin}`;
           } catch (err) {
             console.error(err);
             showStatus("error", `❌ Lỗi: ${err.message}`);
