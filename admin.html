@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/jpeg" href="assets/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản Lý Thu Chi - Thêm Giao Dịch</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #0284c7;
+        --bg-color: #f8fafc;
+        --card-bg: #ffffff;
+        --text-color: #1e293b;
+        --border-color: #e2e8f0;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Mulish", sans-serif;
+      }
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        padding: 20px 12px;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--border-color);
+      }
+
+      h2 {
+        font-size: 1.25rem;
+        margin-bottom: 15px;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 6px;
+        font-size: 0.9rem;
+      }
+      input[type="text"],
+      input[type="number"],
+      input[type="datetime-local"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: var(--primary-color);
+      }
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .type-selector {
+        display: flex;
+        gap: 10px;
+      }
+      .type-btn {
+        flex: 1;
+        padding: 10px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        font-weight: bold;
+        text-align: center;
+        transition: all 0.2s;
+      }
+      .type-btn.active.thu {
+        background-color: #dcfce7;
+        border-color: #16a34a;
+        color: #15803d;
+      }
+      .type-btn.active.chi {
+        background-color: #fee2e2;
+        border-color: #dc2626;
+        color: #b91c1c;
+      }
+
+      .btn-submit {
+        width: 100%;
+        padding: 12px;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-submit:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+      }
+
+      #statusBox {
+        display: none;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 15px;
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+      #statusBox.info {
+        background: #e0f2fe;
+        color: #0369a1;
+        border: 1px solid #bae6fd;
+      }
+      #statusBox.success {
+        background: #dcfce7;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+      }
+      #statusBox.error {
+        background: #fee2e2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+      }
+
+      .file-hint {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Cấu hình GitHub (PAT Token) -->
+      <div class="card">
+        <h2><i class="fa-solid fa-gear"></i> Cấu hình GitHub API</h2>
+        <div class="form-group">
+          <label>Tên tài khoản GitHub (Owner):</label>
+          <input type="text" id="ghOwner" placeholder="Ví dụ: myusername" />
+        </div>
+        <div class="form-group">
+          <label>Tên Repository (Repo):</label>
+          <input type="text" id="ghRepo" placeholder="Ví dụ: so-thu-chi" />
+        </div>
+        <div class="form-group">
+          <label>Personal Access Token (PAT):</label>
+          <input
+            type="password"
+            id="ghToken"
+            placeholder="ghp_xxxxxxxxxxxxxxxxx"
+          />
+          <p class="file-hint">
+            Token sẽ được lưu an toàn trong localStorage trên máy này.
+          </p>
+        </div>
+        <button
+          type="button"
+          onclick="saveConfig()"
+          style="
+            padding: 8px 16px;
+            background: #475569;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+          "
+        >
+          Lưu cấu hình
+        </button>
+      </div>
+
+      <!-- Form Nhập Khoản Thu/Chi -->
+      <div class="card">
+        <h2><i class="fa-solid fa-plus-circle"></i> Thêm Giao Dịch Mới</h2>
+        <form id="transactionForm">
+          <div class="form-group">
+            <label>Loại giao dịch:</label>
+            <div class="type-selector">
+              <div class="type-btn thu active" onclick="selectType('thu')">
+                THU (+)
+              </div>
+              <div class="type-btn chi" onclick="selectType('chi')">
+                CHI (-)
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Tiêu đề khoản thu/chi (*):</label>
+            <input
+              type="text"
+              id="title"
+              required
+              placeholder="Ví dụ: Phụ huynh gửi tiền quỹ lớp"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Số tiền (VNĐ) (*):</label>
+            <input
+              type="number"
+              id="amount"
+              required
+              placeholder="Ví dụ: 500000"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Ngày giờ phát sinh (*):</label>
+            <input type="datetime-local" id="datetime" required />
+          </div>
+
+          <div class="form-group">
+            <label>Nội dung chi tiết:</label>
+            <textarea
+              id="content"
+              placeholder="Ví dụ: Phụ huynh NGUYEN VAN A đã gửi tiền vào quỹ."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Biên lai / Chứng từ (Ảnh):</label>
+            <input type="file" id="receiptFile" accept="image/*" />
+            <p class="file-hint">Sẽ tải lên: assets/YYYY-MM/proof/</p>
+          </div>
+
+          <div class="form-group">
+            <label>Văn bản chỉ đạo (PDF / Ảnh):</label>
+            <input type="file" id="docFile" accept=".pdf,image/*" />
+            <p class="file-hint">Sẽ tải lên: assets/YYYY-MM/doc/</p>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Tải lên & Cập nhật
+          </button>
+
+          <div id="statusBox"></div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      let selectedType = "thu";
+
+      // 1. Khởi tạo cấu hình và thời gian mặc định
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("ghOwner").value =
+          localStorage.getItem("gh_owner") || "";
+        document.getElementById("ghRepo").value =
+          localStorage.getItem("gh_repo") || "";
+        document.getElementById("ghToken").value =
+          localStorage.getItem("gh_token") || "";
+
+        // Set thời gian hiện tại
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById("datetime").value = now
+          .toISOString()
+          .slice(0, 16);
+      });
+
+      function saveConfig() {
+        localStorage.setItem(
+          "gh_owner",
+          document.getElementById("ghOwner").value.trim(),
+        );
+        localStorage.setItem(
+          "gh_repo",
+          document.getElementById("ghRepo").value.trim(),
+        );
+        localStorage.setItem(
+          "gh_token",
+          document.getElementById("ghToken").value.trim(),
+        );
+        showStatus("info", "Đã lưu cấu hình GitHub!");
+      }
+
+      function selectType(type) {
+        selectedType = type;
+        document
+          .querySelectorAll(".type-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        document.querySelector(`.type-btn.${type}`).classList.add("active");
+      }
+
+      function showStatus(type, message) {
+        const box = document.getElementById("statusBox");
+        box.className = type;
+        box.style.display = "block";
+        box.innerHTML = message;
+      }
+
+      // 2. Chuyển File sang Base64
+      function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result.split(",")[1]);
+          reader.onerror = (error) => reject(error);
+        });
+      }
+
+      // 3. Gọi GitHub API Upload File
+      async function uploadToGitHub(
+        path,
+        base64Content,
+        message,
+        token,
+        owner,
+        repo,
+      ) {
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+
+        // Kiểm tra xem file đã tồn tại chưa để lấy SHA (nếu ghi đè)
+        let sha = null;
+        try {
+          const checkRes = await fetch(url, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (checkRes.ok) {
+            const data = await checkRes.json();
+            sha = data.sha;
+          }
+        } catch (e) {}
+
+        const body = { message, content: base64Content };
+        if (sha) body.sha = sha;
+
+        const res = await fetch(url, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            Accept: "application/vnd.github+json",
+          },
+          body: JSON.stringify(body),
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.message || "Lỗi upload file lên GitHub");
+        }
+        return await res.json();
+      }
+
+      // 4. Xử lý chính khi bấm Submit Form
+      document
+        .getElementById("transactionForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const owner = document.getElementById("ghOwner").value.trim();
+          const repo = document.getElementById("ghRepo").value.trim();
+          const token = document.getElementById("ghToken").value.trim();
+
+          if (!owner || !repo || !token) {
+            alert("Vui lòng điền đầy đủ cấu hình GitHub (Owner, Repo, Token)!");
+            return;
+          }
+
+          const title = document.getElementById("title").value.trim();
+          const rawAmount = parseInt(document.getElementById("amount").value);
+          const datetimeInput = document.getElementById("datetime").value; // YYYY-MM-DDTHH:mm
+          const content = document.getElementById("content").value.trim();
+          const receiptFile = document.getElementById("receiptFile").files[0];
+          const docFile = document.getElementById("docFile").files[0];
+
+          const submitBtn = document.getElementById("submitBtn");
+          submitBtn.disabled = true;
+
+          try {
+            // Chuẩn hóa định dạng
+            const dt = new Date(datetimeInput);
+            const isoDatetime = dt.toISOString().slice(0, 19); // 2026-09-24T21:35:00
+            const yearMonth = isoDatetime.slice(0, 7); // 2026-09
+
+            // Tạo ID dạng: 260924-102530
+            const dateStr = isoDatetime.slice(2, 10).replace(/-/g, "");
+            const timeStr = isoDatetime.slice(11, 19).replace(/:/g, "");
+            const id = `${dateStr}-${timeStr}`;
+
+            const formattedAmount = rawAmount.toLocaleString("vi-VN") + " VNĐ";
+
+            let receiptUrl = "";
+            let pdfUrl = "";
+
+            // BƯỚC 1: Upload Ảnh Biên lai (nếu có)
+            if (receiptFile) {
+              showStatus("info", "⏳ Đang tải ảnh biên lai lên GitHub...");
+              const ext = receiptFile.name.split(".").pop();
+              const receiptPath = `assets/${yearMonth}/proof/${selectedType}-${id}.${ext}`;
+              const base64 = await fileToBase64(receiptFile);
+
+              await uploadToGitHub(
+                receiptPath,
+                base64,
+                `Upload receipt ${id}`,
+                token,
+                owner,
+                repo,
+              );
+              receiptUrl = receiptPath;
+            }
+
+            // BƯỚC 2: Upload Văn bản chỉ đạo (nếu có)
+            if (docFile) {
+              showStatus("info", "⏳ Đang tải văn bản chỉ đạo lên GitHub...");
+              const ext = docFile.name.split(".").pop();
+              const docPath = `assets/${yearMonth}/doc/${selectedType}-${id}.${ext}`;
+              const base64 = await fileToBase64(docFile);
+
+              await uploadToGitHub(
+                docPath,
+                base64,
+                `Upload doc ${id}`,
+                token,
+                owner,
+                repo,
+              );
+              pdfUrl = docPath;
+            }
+
+            // BƯỚC 3: Cập nhật file js/data.js
+            showStatus("info", "⏳ Đang lấy dữ liệu file js/data.js...");
+            const dataFileUrl = `https://api.github.com/repos/${owner}/${repo}/contents/js/data.js`;
+            const dataRes = await fetch(dataFileUrl, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+
+            if (!dataRes.ok)
+              throw new Error("Không thể đọc tệp js/data.js từ GitHub");
+
+            const dataJson = await dataRes.json();
+            const sha = dataJson.sha;
+
+            // Giải mã Base64 -> Chuỗi UTF-8
+            const bytes = Uint8Array.from(
+              atob(dataJson.content.replace(/\s/g, "")),
+              (c) => c.charCodeAt(0),
+            );
+            const currentJsText = new TextDecoder().decode(bytes);
+
+            // Trích xuất mảng transactionsData
+            const arrayMatch = currentJsText.match(
+              /const\s+transactionsData\s*=\s*(\[\s*[\s\S]*?\])\s*;?/,
+            );
+            if (!arrayMatch)
+              throw new Error(
+                "Cấu trúc file js/data.js không đúng định dạng 'const transactionsData = [...]'",
+              );
+
+            let transactions = eval(arrayMatch[1]);
+
+            // Tạo đối tượng giao dịch mới
+            const newTransaction = {
+              id: id,
+              type: selectedType,
+              datetime: isoDatetime,
+              title: title,
+              content: content,
+              amount: formattedAmount,
+            };
+            if (receiptUrl) newTransaction.receiptUrl = receiptUrl;
+            if (pdfUrl) newTransaction.pdfUrl = pdfUrl;
+
+            // Chèn vào đầu mảng
+            transactions.unshift(newTransaction);
+
+            // Đóng gói lại chuỗi JS
+            const newJsContent = `const transactionsData = ${JSON.stringify(transactions, null, 4)};\n`;
+
+            // Mã hóa chuỗi JS sang Base64 chuẩn UTF-8
+            const encoder = new TextEncoder();
+            const dataBytes = encoder.encode(newJsContent);
+            let binaryStr = "";
+            dataBytes.forEach((b) => (binaryStr += String.fromCharCode(b)));
+            const newBase64 = btoa(binaryStr);
+
+            // Push đè lên file js/data.js
+            showStatus("info", "⏳ Đang cập nhật js/data.js...");
+            await uploadToGitHub(
+              "js/data.js",
+              newBase64,
+              `Thêm giao dịch #${id}`,
+              token,
+              owner,
+              repo,
+            );
+
+            showStatus(
+              "success",
+              `🎉 **Thành công!** Đã thêm khoản ${selectedType === "thu" ? "Thu" : "Chi"} mã #${id}. Web sẽ cập nhật sau 20-30s.`,
+            );
+
+            // Reset form ngoại trừ thông tin GitHub
+            document.getElementById("transactionForm").reset();
+            selectType("thu");
+          } catch (err) {
+            console.error(err);
+            showStatus("error", `❌ Lỗi: ${err.message}`);
+          } finally {
+            submitBtn.disabled = false;
+          }
+        });
+    </script>
+  </body>
+</html>
