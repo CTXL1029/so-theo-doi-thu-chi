@@ -3,12 +3,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const selectMonth = document.getElementById("select-month");
   const transactionList = document.getElementById("transaction-list");
   const tabButtons = document.querySelectorAll(".tab-btn");
-  const summaryCard = document.getElementById("summary-card");
-  const summaryLabel = document.querySelector(".summary-label");
-  const summaryTotal = document.getElementById("summary-total");
 
-  // Trạng thái hiện tại
-  let currentTab = "thu"; // Mặc định mở Tab Thu trước ('thu' hoặc 'chi')
+  // Đăng ký các phần tử bảng thống kê
+  const totalBalanceEl = document.getElementById("total-balance");
+  const monthlyCardEl = document.getElementById("monthly-card");
+  const monthlyLabelEl = document.getElementById("monthly-label");
+  const monthlyTotalEl = document.getElementById("monthly-total");
+
+  let currentTab = "thu"; // Tab mặc định
 
   // 1. Tự động chọn Tháng/Năm hiện tại
   const now = new Date();
@@ -37,10 +39,41 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  // 3. Render danh sách giao dịch
+  // 3. TÍNH QUỸ LỚP HIỆN TẠI (TỔNG THU TOÀN BỘ - TỔNG CHI TOÀN BỘ)
+  function calculateCurrentBalance() {
+    let totalIncome = 0;
+    let totalExpense = 0;
+
+    transactionsData.forEach((item) => {
+      const num = parseInt(item.amount.replace(/[^0-9]/g, ""));
+      if (!isNaN(num)) {
+        if (item.type === "thu") {
+          totalIncome += num;
+        } else if (item.type === "chi") {
+          totalExpense += num;
+        }
+      }
+    });
+
+    const currentBalance = totalIncome - totalExpense;
+    totalBalanceEl.textContent =
+      currentBalance.toLocaleString("vi-VN") + " VNĐ";
+
+    // Đổi màu chữ nếu quỹ âm
+    if (currentBalance < 0) {
+      totalBalanceEl.style.color = "#dc2626";
+    } else {
+      totalBalanceEl.style.color = "#0369a1";
+    }
+  }
+
+  // 4. RENDER DANH SÁCH & TỔNG PHÁT SINH TRONG THÁNG
   function renderTransactions() {
     const selectedY = parseInt(selectYear.value);
     const selectedM = parseInt(selectMonth.value);
+
+    // Cập nhật số dư Quỹ toàn thời gian
+    calculateCurrentBalance();
 
     // Lọc theo Tab (Thu/Chi) và Tháng/Năm chọn
     let filtered = transactionsData.filter((item) => {
@@ -55,22 +88,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // Sắp xếp MỚI NHẤT LÊN ĐẦU
     filtered.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
 
-    // Cập nhật giao diện Thẻ Tổng quan
+    // Cập nhật thẻ thống kê Tháng
     if (currentTab === "thu") {
-      summaryCard.className = "summary-card thu-mode";
-      summaryLabel.textContent = `Tổng thu Tháng ${selectedM}/${selectedY}:`;
+      monthlyCardEl.className = "summary-card monthly-card thu-mode";
+      monthlyLabelEl.textContent = `Tổng thu Tháng ${selectedM}/${selectedY}`;
     } else {
-      summaryCard.className = "summary-card chi-mode";
-      summaryLabel.textContent = `Tổng chi Tháng ${selectedM}/${selectedY}:`;
+      monthlyCardEl.className = "summary-card monthly-card chi-mode";
+      monthlyLabelEl.textContent = `Tổng chi Tháng ${selectedM}/${selectedY}`;
     }
 
-    // Tự động tính tổng tiền nếu khớp định dạng "xxx.xxx VNĐ"
-    let totalAmount = 0;
+    // Tính tổng tiền trong tháng đang chọn
+    let monthlyTotal = 0;
     filtered.forEach((item) => {
       const num = parseInt(item.amount.replace(/[^0-9]/g, ""));
-      if (!isNaN(num)) totalAmount += num;
+      if (!isNaN(num)) monthlyTotal += num;
     });
-    summaryTotal.textContent = totalAmount.toLocaleString("vi-VN") + " VNĐ";
+    monthlyTotalEl.textContent = monthlyTotal.toLocaleString("vi-VN") + " VNĐ";
 
     // Clear danh sách cũ
     transactionList.innerHTML = "";
@@ -143,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 4. Xử lý sự kiện chuyển Tab
+  // 5. Lắng nghe chuyển Tab & Bộ lọc
   tabButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       tabButtons.forEach((b) => b.classList.remove("active"));
@@ -153,7 +186,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // 5. Lắng nghe thay đổi Tháng/Năm
   selectYear.addEventListener("change", renderTransactions);
   selectMonth.addEventListener("change", renderTransactions);
 

@@ -73,10 +73,27 @@
     </header>
 
     <main class="container">
-      <!-- Thẻ Tổng quan (Summary) số tiền trong tháng -->
-      <div id="summary-card" class="summary-card thu-mode">
-        <span class="summary-label">Tổng thu trong tháng:</span>
-        <span id="summary-total" class="summary-value">0 VNĐ</span>
+      <!-- Khối Bảng Thống Kê Tổng Quan -->
+      <div class="summary-container">
+        <!-- Thẻ 1: Quỹ Hiện Tại (Toàn thời gian - Cố định ở cả Thu & Chi) -->
+        <div class="summary-card balance-card">
+          <div class="summary-icon"><i class="fa-solid fa-piggy-bank"></i></div>
+          <div class="summary-info">
+            <span class="summary-label">Quỹ lớp hiện tại</span>
+            <span id="total-balance" class="summary-value">0 VNĐ</span>
+          </div>
+        </div>
+
+        <!-- Thẻ 2: Tổng Thu/Chi của Tháng đang chọn -->
+        <div id="monthly-card" class="summary-card monthly-card thu-mode">
+          <div class="summary-icon"><i class="fa-solid fa-chart-line"></i></div>
+          <div class="summary-info">
+            <span id="monthly-label" class="summary-label"
+              >Tổng thu Tháng 9/2026</span
+            >
+            <span id="monthly-total" class="summary-value">0 VNĐ</span>
+          </div>
+        </div>
       </div>
 
       <!-- Danh sách các ô giao dịch Thu / Chi -->
