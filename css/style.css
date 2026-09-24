@@ -1,0 +1,311 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Mulish", sans-serif;
+}
+
+body {
+  background-color: #f8fafc;
+  color: #334155;
+  padding-bottom: 50px;
+}
+
+/* --- HEADER --- */
+.main-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: white;
+  padding: 25px 15px 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.class-title-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.class-title-box i {
+  font-size: 1.8rem;
+  color: #38bdf8;
+}
+
+.class-title-box h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* --- TAB CHUYỂN THU / CHI --- */
+.tab-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  background-color: #334155;
+  color: #94a3b8;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+  background-color: #475569;
+  color: white;
+}
+
+/* Tab THU active */
+.tab-btn[data-tab="thu"].active {
+  background-color: #10b981;
+  color: white;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+}
+
+/* Tab CHI active */
+.tab-btn[data-tab="chi"].active {
+  background-color: #ef4444;
+  color: white;
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+}
+
+/* --- BỘ LỌC THÁNG / NĂM --- */
+.filter-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 6px 14px;
+  border-radius: 8px;
+  backdrop-filter: blur(5px);
+}
+
+.filter-group label {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+}
+
+.filter-group select {
+  background-color: #1e293b;
+  color: white;
+  border: 1px solid #475569;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+  cursor: pointer;
+}
+
+/* --- CONTAINER & SUMMARY --- */
+.container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 0 15px;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border-left: 5px solid #10b981;
+}
+
+.summary-card.chi-mode {
+  border-left-color: #ef4444;
+}
+
+.summary-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.summary-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.summary-card.chi-mode .summary-value {
+  color: #ef4444;
+}
+
+/* --- CARD ITEM (Accordion) --- */
+.transaction-item {
+  background: white;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.transaction-header {
+  padding: 15px 20px;
+  background-color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+
+.transaction-header:hover {
+  background-color: #f8fafc;
+}
+
+.date-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.date-str {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+.time-str {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.title-preview {
+  font-size: 0.95rem;
+  color: #334155;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.toggle-icon {
+  font-size: 1.1rem;
+  color: #94a3b8;
+  transition: transform 0.3s ease;
+}
+
+/* Expanded State */
+.transaction-body {
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.3s ease-out,
+    padding 0.3s ease;
+  padding: 0 20px;
+  background-color: #fafafa;
+  border-top: 1px solid #f1f5f9;
+}
+
+.transaction-item.active .transaction-body {
+  padding: 20px;
+  max-height: 2000px;
+}
+
+.transaction-item.active .toggle-icon {
+  transform: rotate(180deg);
+}
+
+/* Details inside */
+.amount-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+}
+
+.amount-badge.thu {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.amount-badge.chi {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.content-box {
+  margin-bottom: 15px;
+}
+
+.content-box h4 {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.content-box p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #1e293b;
+}
+
+.btn-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #2563eb;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  transition: background 0.2s;
+}
+
+.btn-pdf:hover {
+  background-color: #1d4ed8;
+}
+
+.receipt-box h4 {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.receipt-img {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  display: block;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #94a3b8;
+  font-size: 1.05rem;
+}

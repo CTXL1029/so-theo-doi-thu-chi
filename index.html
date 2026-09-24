@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpeg" href="assets/favicon.png" />
+    <title>Sổ Thu Chi Lớp Học</title>
+    <!-- Chèn vào trong thẻ <head> của index.html và pdf-viewer.html -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300..900;1,300..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- FontAwesome icon -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="main-header">
+      <!-- 1. Tiêu đề Lớp -->
+      <div class="class-title-box">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <h1 id="class-title">SỔ THU CHI LỚP K60G</h1>
+      </div>
+
+      <!-- 2. Thanh Tab Thu / Chi -->
+      <div class="tab-container">
+        <button class="tab-btn active" data-tab="thu">
+          <i class="fa-solid fa-hand-holding-dollar"></i> Khoản Thu
+        </button>
+        <button class="tab-btn" data-tab="chi">
+          <i class="fa-solid fa-money-bill-wave"></i> Khoản Chi
+        </button>
+      </div>
+
+      <!-- 3. Bộ lọc Năm & Tháng -->
+      <div class="filter-container">
+        <div class="filter-group">
+          <label for="select-year"
+            ><i class="fa-regular fa-calendar"></i> Năm:</label
+          >
+          <select id="select-year">
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="select-month"
+            ><i class="fa-regular fa-calendar-days"></i> Tháng:</label
+          >
+          <select id="select-month">
+            <option value="1">Tháng 1</option>
+            <option value="2">Tháng 2</option>
+            <option value="3">Tháng 3</option>
+            <option value="4">Tháng 4</option>
+            <option value="5">Tháng 5</option>
+            <option value="6">Tháng 6</option>
+            <option value="7">Tháng 7</option>
+            <option value="8">Tháng 8</option>
+            <option value="9">Tháng 9</option>
+            <option value="10">Tháng 10</option>
+            <option value="11">Tháng 11</option>
+            <option value="12">Tháng 12</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <!-- Thẻ Tổng quan (Summary) số tiền trong tháng -->
+      <div id="summary-card" class="summary-card thu-mode">
+        <span class="summary-label">Tổng thu trong tháng:</span>
+        <span id="summary-total" class="summary-value">0 VNĐ</span>
+      </div>
+
+      <!-- Danh sách các ô giao dịch Thu / Chi -->
+      <div id="transaction-list" class="transaction-list">
+        <!-- Dữ liệu JS sẽ đổ vào đây -->
+      </div>
+    </main>
+
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
