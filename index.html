@@ -121,5 +121,33 @@
 
     <script src="js/data.js"></script>
     <script src="js/main.js"></script>
+    <!-- Pop-up Thông báo Dữ liệu -->
+    <div id="noticeModal" class="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <h3>Thông Báo Dữ Liệu</h3>
+        </div>
+        <div class="modal-body">
+          <p>
+            Trang web này
+            <strong>không cập nhật theo thời gian thực (Real-time)</strong>.
+          </p>
+          <p>
+            Dữ liệu thu / chi và các chứng từ biên lai được cập nhật định kỳ khi
+            Quản trị viên tải lên hệ thống. Xin cảm ơn!
+          </p>
+        </div>
+        <div class="modal-footer">
+          <label class="checkbox-label">
+            <input type="checkbox" id="dontShowAgain" />
+            <span>Không hiển thị lại thông báo này</span>
+          </label>
+          <button id="closeNoticeBtn" class="btn-close-modal">
+            Tôi đã hiểu
+          </button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

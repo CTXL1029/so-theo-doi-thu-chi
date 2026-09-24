@@ -1,4 +1,32 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const noticeModal = document.getElementById("noticeModal");
+  const closeNoticeBtn = document.getElementById("closeNoticeBtn");
+  const dontShowAgain = document.getElementById("dontShowAgain");
+
+  // Kiểm tra xem người dùng đã tick "Không hiển thị lại" trước đó chưa
+  const isHidden = localStorage.getItem("hide_realtime_notice");
+
+  // Nếu chưa tick -> Hiển thị Pop-up
+  if (!isHidden) {
+    // Trễ nhẹ 300ms để hiệu ứng xuất hiện mượt mà hơn khi vừa mở trang
+    setTimeout(() => {
+      noticeModal.classList.add("active");
+    }, 300);
+  }
+
+  // Xử lý khi nhấn nút "Tôi đã hiểu"
+  closeNoticeBtn.addEventListener("click", () => {
+    // Nếu người dùng có tích chọn ô "Không hiển thị lại"
+    if (dontShowAgain.checked) {
+      localStorage.setItem("hide_realtime_notice", "true");
+    }
+
+    // Tắt Pop-up
+    noticeModal.classList.remove("active");
+  });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
   // 1. Khai báo các phần tử DOM
   const selectYear = document.getElementById("select-year");
   const selectMonth = document.getElementById("select-month");
