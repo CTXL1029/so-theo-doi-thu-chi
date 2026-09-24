@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const currentMonth = now.getMonth() + 1;
 
   if (selectYear) {
-    if (currentYear >= 2026 && currentYear <= 2027) {
+    if (currentYear >= 2026 && currentYear <= 2028) {
       selectYear.value = currentYear.toString();
     } else {
       selectYear.value = "2026";
