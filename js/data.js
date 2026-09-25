@@ -141,7 +141,7 @@ const transactionsData = [
     "content": "Phụ huynh Nguyenthidoanh đã gửi tiền mặt vào quỹ lớp.",
     "amount": "200.000 VNĐ",
     "pdfUrl": "",
-    "receiptUrl": "assets/2026-09/proof/Screenshot_20260924_185429_Zalopay.png"
+    "receiptUrl": "assets/2026-09/proof/Screenshot_20260924_185455_Zalopay.png"
   },
   {
     "id": "260924-003099405",
