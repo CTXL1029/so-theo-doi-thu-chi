@@ -1,33 +1,32 @@
-document.addEventListener("DOMContentLoaded", () => {
+function initApp() {
+  // --------------------------------------------------------
+  // 1. Xử lý Pop-up Thông báo
+  // --------------------------------------------------------
   const noticeModal = document.getElementById("noticeModal");
   const closeNoticeBtn = document.getElementById("closeNoticeBtn");
   const dontShowAgain = document.getElementById("dontShowAgain");
 
-  // Kiểm tra xem người dùng đã tick "Không hiển thị lại" trước đó chưa
-  const isHidden = localStorage.getItem("hide_realtime_notice");
+  if (noticeModal && closeNoticeBtn && dontShowAgain) {
+    // Kiểm tra xem người dùng đã tick "Không hiển thị lại" trước đó chưa
+    const isHidden = localStorage.getItem("hide_realtime_notice");
 
-  // Nếu chưa tick -> Hiển thị Pop-up
-  if (!isHidden) {
-    // Trễ nhẹ 300ms để hiệu ứng xuất hiện mượt mà hơn khi vừa mở trang
-    setTimeout(() => {
-      noticeModal.classList.add("active");
-    }, 300);
-  }
-
-  // Xử lý khi nhấn nút "Tôi đã hiểu"
-  closeNoticeBtn.addEventListener("click", () => {
-    // Nếu người dùng có tích chọn ô "Không hiển thị lại"
-    if (dontShowAgain.checked) {
-      localStorage.setItem("hide_realtime_notice", "true");
+    if (!isHidden) {
+      setTimeout(() => {
+        noticeModal.classList.add("active");
+      }, 300);
     }
 
-    // Tắt Pop-up
-    noticeModal.classList.remove("active");
-  });
-});
+    closeNoticeBtn.addEventListener("click", () => {
+      if (dontShowAgain.checked) {
+        localStorage.setItem("hide_realtime_notice", "true");
+      }
+      noticeModal.classList.remove("active");
+    });
+  }
 
-document.addEventListener("DOMContentLoaded", () => {
-  // 1. Khai báo các phần tử DOM
+  // --------------------------------------------------------
+  // 2. Khai báo các phần tử DOM cho tính năng chính
+  // --------------------------------------------------------
   const selectYear = document.getElementById("select-year");
   const selectMonth = document.getElementById("select-month");
   const transactionList = document.getElementById("transaction-list");
@@ -44,7 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentTab = "thu"; // Tab mặc định ('thu' hoặc 'chi')
 
-  // 2. Thiết lập Tháng/Năm hiện tại
+  // --------------------------------------------------------
+  // 3. Thiết lập Tháng/Năm hiện tại
+  // --------------------------------------------------------
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
@@ -60,8 +61,9 @@ document.addEventListener("DOMContentLoaded", () => {
     selectMonth.value = currentMonth.toString();
   }
 
-  // 3. Các hàm bổ trợ
-  // Loại bỏ dấu tiếng Việt để tìm kiếm không dấu
+  // --------------------------------------------------------
+  // 4. Các hàm bổ trợ
+  // --------------------------------------------------------
   function removeVietnameseTones(str) {
     if (!str) return "";
     str = str.toString().toLowerCase();
@@ -70,7 +72,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return str.trim();
   }
 
-  // Định dạng ngày giờ hiển thị
   function formatDateTime(isoString) {
     const d = new Date(isoString);
     const day = String(d.getDate()).padStart(2, "0");
@@ -85,7 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  // Tạo chuỗi ngày giờ đa định dạng phục vụ tìm kiếm
   function getSearchableDateFormats(isoDateString) {
     if (!isoDateString) return "";
     const date = new Date(isoDateString);
@@ -110,22 +110,27 @@ document.addEventListener("DOMContentLoaded", () => {
     ].join(" ");
   }
 
-  // 4. Tính tổng số dư Quỹ hiện tại (Toàn thời gian)
+  // --------------------------------------------------------
+  // 5. Tính tổng số dư Quỹ hiện tại (Toàn thời gian)
+  // --------------------------------------------------------
   function calculateCurrentBalance() {
     if (!totalBalanceEl) return;
     let totalIncome = 0;
     let totalExpense = 0;
 
-    transactionsData.forEach((item) => {
-      const num = parseInt(item.amount.toString().replace(/[^0-9]/g, ""));
-      if (!isNaN(num)) {
-        if (item.type === "thu") {
-          totalIncome += num;
-        } else if (item.type === "chi") {
-          totalExpense += num;
+    // Giả sử mảng transactionsData đã được load đầy đủ từ data.js
+    if (typeof transactionsData !== "undefined") {
+      transactionsData.forEach((item) => {
+        const num = parseInt(item.amount.toString().replace(/[^0-9]/g, ""));
+        if (!isNaN(num)) {
+          if (item.type === "thu") {
+            totalIncome += num;
+          } else if (item.type === "chi") {
+            totalExpense += num;
+          }
         }
-      }
-    });
+      });
+    }
 
     const currentBalance = totalIncome - totalExpense;
     totalBalanceEl.textContent =
@@ -138,8 +143,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 5. Hàm Render danh sách giao dịch chính
+  // --------------------------------------------------------
+  // 6. Hàm Render danh sách giao dịch chính
+  // --------------------------------------------------------
   function renderTransactions() {
+    if (typeof transactionsData === "undefined") return;
+
     const selectedY = selectYear ? parseInt(selectYear.value) : currentYear;
     const selectedM = selectMonth ? parseInt(selectMonth.value) : currentMonth;
     const filterKeyword = searchInput ? searchInput.value : "";
@@ -214,6 +223,8 @@ document.addEventListener("DOMContentLoaded", () => {
           monthlyTotal.toLocaleString("vi-VN") + " VNĐ";
       }
     }
+
+    if (!transactionList) return;
 
     // Xóa danh sách cũ
     transactionList.innerHTML = "";
@@ -293,7 +304,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 6. Đăng ký sự kiện
+  // --------------------------------------------------------
+  // 7. Đăng ký sự kiện (Lắng nghe Click, Change, Input)
+  // --------------------------------------------------------
   tabButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       tabButtons.forEach((b) => b.classList.remove("active"));
@@ -341,4 +354,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Chạy ứng dụng lần đầu
   renderTransactions();
-});
+}
+
+// --------------------------------------------------------
+// Cơ chế khởi chạy (tránh xung đột khi tải Script động)
+// --------------------------------------------------------
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initApp);
+} else {
+  // Nếu HTML đã tải xong rồi thì chạy hàm initApp luôn
+  initApp();
+}

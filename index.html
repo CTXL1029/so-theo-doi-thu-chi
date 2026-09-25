@@ -3,6 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Khai báo các thẻ Meta ngăn chặn trình duyệt cache file HTML -->
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
     <link rel="icon" type="image/jpeg" href="assets/favicon.png" />
     <title>Sổ Thu Chi Lớp Học</title>
     <!-- Chèn vào trong thẻ <head> của index.html và pdf-viewer.html -->
@@ -119,8 +128,25 @@
       </div>
     </main>
 
-    <script src="js/data.js"></script>
-    <script src="js/main.js"></script>
+    <!-- Script tạo link tải file động chống Cache hoàn toàn -->
+    <script>
+      const ts = new Date().getTime(); // Mốc thời gian độc nhất
+
+      // Khởi tạo script tải file data.js trước
+      const dataScript = document.createElement("script");
+      dataScript.src = "js/data.js?v=" + ts;
+
+      // Sau khi data.js tải xong, tiếp tục tải main.js
+      dataScript.onload = () => {
+        const mainScript = document.createElement("script");
+        mainScript.src = "js/main.js?v=" + ts;
+        document.body.appendChild(mainScript);
+      };
+
+      // Bắt đầu nhúng vào giao diện
+      document.body.appendChild(dataScript);
+    </script>
+
     <!-- Pop-up Thông báo Dữ liệu -->
     <div id="noticeModal" class="modal-overlay">
       <div class="modal-card">
