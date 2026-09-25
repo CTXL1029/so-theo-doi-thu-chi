@@ -1,3 +1,0 @@
-Hiện tại tôi đang có một dự án web nho nhỏ được lưu trong một repo GitHub. Từ bây giờ bạn hãy cùng tôi sửa, thêm tính năng cho trang web này nhé. Đồng thời tôi cũng gửi bạn file treePath.txt chữa đường dẫn của các file.
-
-Okay bây giờ tôi không muốn trang tách hai khoản thu chi nữa mà gộp chung lại một list, chỉ đến khi nào user chọn thu / chi / tất cả giao dịch thì 
