@@ -1,2 +1,0 @@
-Hiện tại tôi đang có một dự án web nho nhỏ được lưu trong một repo GitHub. Từ bây giờ bạn hãy cùng tôi sửa, thêm tính năng cho trang web này nhé. Đồng thời tôi cũng gửi bạn file treePath.txt chữa đường dẫn của các file.
-Mặc dù trang web được update rồi nhưng khi tải lại trang thì nó không cập nhật dữ liệu luôn, phải để tôi xóa dữ liệu trang web / vào bằng trình duyệt mới thì nó mới load lại list. Vậy có cách nào khi tôi chỉ cần tải lại trang thì nó sẽ cập nhật luôn thông tin mới nhất không?
