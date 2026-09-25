@@ -39,54 +39,13 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* --- TAB CHUYỂN THU / CHI --- */
-.tab-container {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.tab-btn {
-  background-color: #334155;
-  color: #94a3b8;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 30px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-}
-
-.tab-btn:hover {
-  background-color: #475569;
-  color: white;
-}
-
-/* Tab THU active */
-.tab-btn[data-tab="thu"].active {
-  background-color: #10b981;
-  color: white;
-  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
-}
-
-/* Tab CHI active */
-.tab-btn[data-tab="chi"].active {
-  background-color: #ef4444;
-  color: white;
-  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
-}
-
-/* --- BỘ LỌC THÁNG / NĂM --- */
+/* --- BỘ LỌC THÁNG / NĂM / LOẠI --- */
 .filter-container {
   display: flex;
   justify-content: center;
   gap: 15px;
   flex-wrap: wrap;
+  margin-bottom: 15px;
 }
 
 .filter-group {
@@ -217,26 +176,6 @@ body {
   margin-top: 4px;
 }
 
-.summary-card.chi-mode {
-  border-left-color: #ef4444;
-}
-
-.summary-label {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #64748b;
-}
-
-.summary-value {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #10b981;
-}
-
-.summary-card.chi-mode .summary-value {
-  color: #ef4444;
-}
-
 /* --- CARD ITEM (Accordion) --- */
 .transaction-item {
   background: white;
@@ -246,6 +185,14 @@ body {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
   border: 1px solid #e2e8f0;
   transition: all 0.3s ease;
+}
+
+/* Thêm viền trái báo cáo */
+.transaction-item.thu {
+  border-left: 5px solid #10b981;
+}
+.transaction-item.chi {
+  border-left: 5px solid #ef4444;
 }
 
 .transaction-header {
@@ -279,11 +226,24 @@ body {
   margin-top: 2px;
 }
 
+/* Hiển thị số tiền nhỏ ở HEADER (Dưới giờ) */
+.amount-preview {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-top: 6px;
+}
+.amount-preview.thu {
+  color: #059669;
+}
+.amount-preview.chi {
+  color: #dc2626;
+}
+
 .title-preview {
   font-size: 0.95rem;
   color: #334155;
-  margin-top: 4px;
-  font-weight: 500;
+  margin-top: 6px;
+  font-weight: 600;
 }
 
 .toggle-icon {

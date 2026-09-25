@@ -37,18 +37,19 @@
         <h1 id="class-title">SỔ THU CHI LỚP K60G</h1>
       </div>
 
-      <!-- 2. Thanh Tab Thu / Chi -->
-      <div class="tab-container">
-        <button class="tab-btn active" data-tab="thu">
-          <i class="fa-solid fa-hand-holding-dollar"></i> Khoản Thu
-        </button>
-        <button class="tab-btn" data-tab="chi">
-          <i class="fa-solid fa-money-bill-wave"></i> Khoản Chi
-        </button>
-      </div>
-
-      <!-- 3. Bộ lọc Năm & Tháng -->
+      <!-- 2. Bộ lọc Loại & Thời gian -->
       <div class="filter-container">
+        <div class="filter-group">
+          <label for="select-type"
+            ><i class="fa-solid fa-list"></i> Loại:</label
+          >
+          <select id="select-type">
+            <option value="all">Tất cả</option>
+            <option value="thu">Khoản Thu (+)</option>
+            <option value="chi">Khoản Chi (-)</option>
+          </select>
+        </div>
+
         <div class="filter-group">
           <label for="select-year"
             ><i class="fa-regular fa-calendar"></i> Năm:</label
@@ -99,7 +100,7 @@
           <div class="summary-icon"><i class="fa-solid fa-chart-line"></i></div>
           <div class="summary-info">
             <span id="monthly-label" class="summary-label"
-              >Tổng thu Tháng 9/2026</span
+              >Biến động Tháng 9/2026</span
             >
             <span id="monthly-total" class="summary-value">0 VNĐ</span>
           </div>
@@ -132,18 +133,15 @@
     <script>
       const ts = new Date().getTime(); // Mốc thời gian độc nhất
 
-      // Khởi tạo script tải file data.js trước
       const dataScript = document.createElement("script");
       dataScript.src = "js/data.js?v=" + ts;
 
-      // Sau khi data.js tải xong, tiếp tục tải main.js
       dataScript.onload = () => {
         const mainScript = document.createElement("script");
         mainScript.src = "js/main.js?v=" + ts;
         document.body.appendChild(mainScript);
       };
 
-      // Bắt đầu nhúng vào giao diện
       document.body.appendChild(dataScript);
     </script>
 

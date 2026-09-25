@@ -7,15 +7,12 @@ function initApp() {
   const dontShowAgain = document.getElementById("dontShowAgain");
 
   if (noticeModal && closeNoticeBtn && dontShowAgain) {
-    // Kiểm tra xem người dùng đã tick "Không hiển thị lại" trước đó chưa
     const isHidden = localStorage.getItem("hide_realtime_notice");
-
     if (!isHidden) {
       setTimeout(() => {
         noticeModal.classList.add("active");
       }, 300);
     }
-
     closeNoticeBtn.addEventListener("click", () => {
       if (dontShowAgain.checked) {
         localStorage.setItem("hide_realtime_notice", "true");
@@ -27,10 +24,10 @@ function initApp() {
   // --------------------------------------------------------
   // 2. Khai báo các phần tử DOM cho tính năng chính
   // --------------------------------------------------------
+  const selectType = document.getElementById("select-type");
   const selectYear = document.getElementById("select-year");
   const selectMonth = document.getElementById("select-month");
   const transactionList = document.getElementById("transaction-list");
-  const tabButtons = document.querySelectorAll(".tab-btn");
 
   const totalBalanceEl = document.getElementById("total-balance");
   const monthlyCardEl = document.getElementById("monthly-card");
@@ -40,8 +37,6 @@ function initApp() {
   const searchInput = document.getElementById("searchInput");
   const clearSearchBtn = document.getElementById("clearSearchBtn");
   const searchBoxContainer = document.getElementById("searchBoxContainer");
-
-  let currentTab = "thu"; // Tab mặc định ('thu' hoặc 'chi')
 
   // --------------------------------------------------------
   // 3. Thiết lập Tháng/Năm hiện tại
@@ -79,7 +74,6 @@ function initApp() {
     const year = d.getFullYear();
     const hours = String(d.getHours()).padStart(2, "0");
     const minutes = String(d.getMinutes()).padStart(2, "0");
-
     return {
       dateStr: `Ngày ${day}/${month}/${year}`,
       timeStr: `${hours}:${minutes}`,
@@ -90,13 +84,11 @@ function initApp() {
     if (!isoDateString) return "";
     const date = new Date(isoDateString);
     if (isNaN(date.getTime())) return isoDateString;
-
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
-
     return [
       isoDateString,
       `${day}/${month}/${year}`,
@@ -118,16 +110,12 @@ function initApp() {
     let totalIncome = 0;
     let totalExpense = 0;
 
-    // Giả sử mảng transactionsData đã được load đầy đủ từ data.js
     if (typeof transactionsData !== "undefined") {
       transactionsData.forEach((item) => {
         const num = parseInt(item.amount.toString().replace(/[^0-9]/g, ""));
         if (!isNaN(num)) {
-          if (item.type === "thu") {
-            totalIncome += num;
-          } else if (item.type === "chi") {
-            totalExpense += num;
-          }
+          if (item.type === "thu") totalIncome += num;
+          else if (item.type === "chi") totalExpense += num;
         }
       });
     }
@@ -135,12 +123,7 @@ function initApp() {
     const currentBalance = totalIncome - totalExpense;
     totalBalanceEl.textContent =
       currentBalance.toLocaleString("vi-VN") + " VNĐ";
-
-    if (currentBalance < 0) {
-      totalBalanceEl.style.color = "#dc2626";
-    } else {
-      totalBalanceEl.style.color = "#0369a1";
-    }
+    totalBalanceEl.style.color = currentBalance < 0 ? "#dc2626" : "#0369a1";
   }
 
   // --------------------------------------------------------
@@ -151,6 +134,7 @@ function initApp() {
 
     const selectedY = selectYear ? parseInt(selectYear.value) : currentYear;
     const selectedM = selectMonth ? parseInt(selectMonth.value) : currentMonth;
+    const typeFilter = selectType ? selectType.value : "all"; // all, thu, chi
     const filterKeyword = searchInput ? searchInput.value : "";
     const cleanKeyword = removeVietnameseTones(filterKeyword);
 
@@ -161,7 +145,7 @@ function initApp() {
     let filtered = transactionsData.filter((item) => {
       const itemDate = new Date(item.datetime);
 
-      // NẾU ĐANG TÌM KIẾM: Tìm trên TOÀN BỘ CẢ THU VÀ CHI + TOÀN BỘ THỜI GIAN
+      // NẾU ĐANG TÌM KIẾM:
       if (cleanKeyword) {
         const searchTarget = [
           item.id || "",
@@ -172,12 +156,12 @@ function initApp() {
           getSearchableDateFormats(item.datetime),
         ].join(" ");
 
-        const cleanTarget = removeVietnameseTones(searchTarget);
-        return cleanTarget.includes(cleanKeyword);
+        return removeVietnameseTones(searchTarget).includes(cleanKeyword);
       } else {
-        // NẾU KHÔNG TÌM KIẾM: Lọc đúng theo Tab đang chọn + Tháng/Năm chọn
+        // NẾU KHÔNG TÌM KIẾM: Lọc theo Bộ Lọc Mới
+        const typeMatch = typeFilter === "all" || item.type === typeFilter;
         return (
-          item.type === currentTab &&
+          typeMatch &&
           itemDate.getFullYear() === selectedY &&
           itemDate.getMonth() + 1 === selectedM
         );
@@ -187,13 +171,12 @@ function initApp() {
     // Sắp xếp MỚI NHẤT LÊN ĐẦU
     filtered.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
 
-    // Cập nhật thẻ thống kê
+    // Cập nhật thẻ thống kê Tháng (hoặc theo kết quả tìm kiếm)
     if (monthlyCardEl && monthlyLabelEl && monthlyTotalEl) {
       if (cleanKeyword) {
         monthlyCardEl.className = "summary-card monthly-card thu-mode";
-        monthlyLabelEl.textContent = `Kết quả tìm kiếm toàn bộ Thu & Chi (${filtered.length})`;
+        monthlyLabelEl.textContent = `Kết quả tìm kiếm (${filtered.length})`;
 
-        // Tính tổng chênh lệch của các kết quả tìm kiếm (Thu - Chi)
         let searchBalance = 0;
         filtered.forEach((item) => {
           const num = parseInt(item.amount.toString().replace(/[^0-9]/g, ""));
@@ -202,25 +185,47 @@ function initApp() {
           }
         });
         monthlyTotalEl.textContent =
-          (searchBalance >= 0 ? "+" : "") +
+          (searchBalance > 0 ? "+" : "") +
           searchBalance.toLocaleString("vi-VN") +
           " VNĐ";
       } else {
-        if (currentTab === "thu") {
+        let monthlyTotal = 0;
+
+        if (typeFilter === "thu") {
           monthlyCardEl.className = "summary-card monthly-card thu-mode";
           monthlyLabelEl.textContent = `Tổng thu Tháng ${selectedM}/${selectedY}`;
-        } else {
+          filtered.forEach((i) => {
+            const num = parseInt(i.amount.toString().replace(/[^0-9]/g, ""));
+            if (!isNaN(num)) monthlyTotal += num;
+          });
+          monthlyTotalEl.textContent =
+            "+" + monthlyTotal.toLocaleString("vi-VN") + " VNĐ";
+        } else if (typeFilter === "chi") {
           monthlyCardEl.className = "summary-card monthly-card chi-mode";
           monthlyLabelEl.textContent = `Tổng chi Tháng ${selectedM}/${selectedY}`;
-        }
+          filtered.forEach((i) => {
+            const num = parseInt(i.amount.toString().replace(/[^0-9]/g, ""));
+            if (!isNaN(num)) monthlyTotal += num;
+          });
+          monthlyTotalEl.textContent =
+            "-" + monthlyTotal.toLocaleString("vi-VN") + " VNĐ";
+        } else {
+          // TH Loại: "Tất cả" -> Tính Biến động
+          monthlyLabelEl.textContent = `Biến động Tháng ${selectedM}/${selectedY}`;
+          filtered.forEach((i) => {
+            const num = parseInt(i.amount.toString().replace(/[^0-9]/g, ""));
+            if (!isNaN(num)) monthlyTotal += i.type === "thu" ? num : -num;
+          });
 
-        let monthlyTotal = 0;
-        filtered.forEach((item) => {
-          const num = parseInt(item.amount.toString().replace(/[^0-9]/g, ""));
-          if (!isNaN(num)) monthlyTotal += num;
-        });
-        monthlyTotalEl.textContent =
-          monthlyTotal.toLocaleString("vi-VN") + " VNĐ";
+          monthlyCardEl.className =
+            monthlyTotal >= 0
+              ? "summary-card monthly-card thu-mode"
+              : "summary-card monthly-card chi-mode";
+          monthlyTotalEl.textContent =
+            (monthlyTotal > 0 ? "+" : "") +
+            monthlyTotal.toLocaleString("vi-VN") +
+            " VNĐ";
+        }
       }
     }
 
@@ -236,18 +241,19 @@ function initApp() {
           ${
             cleanKeyword
               ? `Không tìm thấy khoản thu/chi nào phù hợp với từ khóa "${filterKeyword}"`
-              : `Không có khoản ${currentTab === "thu" ? "thu" : "chi"} nào trong Tháng ${selectedM}/${selectedY}`
+              : `Không có giao dịch nào phù hợp trong Tháng ${selectedM}/${selectedY}`
           }
         </div>`;
       return;
     }
 
-    // Tạo các thẻ Accordion
+    // Tạo các thẻ Accordion (Đã phân màu viền theo item.type)
     filtered.forEach((item) => {
       const { dateStr, timeStr } = formatDateTime(item.datetime);
 
       const card = document.createElement("div");
-      card.className = "transaction-item";
+      // Add class "thu" or "chi" to get the green/red left border
+      card.className = `transaction-item ${item.type}`;
 
       card.innerHTML = `
         <div class="transaction-header">
@@ -257,14 +263,14 @@ function initApp() {
               <i class="fa-regular fa-clock"></i> ${timeStr} 
               ${item.id ? `<small style="color:#0284c7; font-weight:600; margin-left:6px;">(#${item.id})</small>` : ""}
             </span>
+            <span class="amount-preview ${item.type}">
+              ${item.type === "thu" ? "+ " : "- "} ${item.amount}
+            </span>
             <span class="title-preview">${item.title}</span>
           </div>
           <i class="fa-solid fa-chevron-down toggle-icon"></i>
         </div>
         <div class="transaction-body">
-          <div class="amount-badge ${item.type}">
-            ${item.type === "thu" ? "+ " : "- "} ${item.amount}
-          </div>
           
           <div class="content-box">
             <h4>Nội dung chi tiết:</h4>
@@ -294,7 +300,6 @@ function initApp() {
         </div>
       `;
 
-      // Lắng nghe sự kiện Click thu gọn/mở rộng
       const header = card.querySelector(".transaction-header");
       header.addEventListener("click", () => {
         card.classList.toggle("active");
@@ -307,21 +312,16 @@ function initApp() {
   // --------------------------------------------------------
   // 7. Đăng ký sự kiện (Lắng nghe Click, Change, Input)
   // --------------------------------------------------------
-  tabButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      tabButtons.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      currentTab = btn.getAttribute("data-tab");
-
-      // Nếu đang tìm kiếm mà bấm đổi Tab -> Tự động xóa từ khóa tìm kiếm
+  if (selectType) {
+    selectType.addEventListener("change", () => {
+      // Tự động xóa từ khóa tìm kiếm khi đổi loại hiển thị
       if (searchInput && searchInput.value) {
         searchInput.value = "";
         if (clearSearchBtn) clearSearchBtn.style.display = "none";
       }
-
       renderTransactions();
     });
-  });
+  }
 
   if (selectYear) selectYear.addEventListener("change", renderTransactions);
   if (selectMonth) selectMonth.addEventListener("change", renderTransactions);
@@ -356,12 +356,8 @@ function initApp() {
   renderTransactions();
 }
 
-// --------------------------------------------------------
-// Cơ chế khởi chạy (tránh xung đột khi tải Script động)
-// --------------------------------------------------------
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initApp);
 } else {
-  // Nếu HTML đã tải xong rồi thì chạy hàm initApp luôn
   initApp();
 }
