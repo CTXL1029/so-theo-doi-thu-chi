@@ -183,10 +183,6 @@
           >
         </h2>
         <div class="form-group">
-          <label>Tên tài khoản GitHub (Owner):</label>
-          <input type="text" id="ghOwner" placeholder="Ví dụ: myusername" />
-        </div>
-        <div class="form-group">
           <label>Tên Repository (Repo):</label>
           <input type="text" id="ghRepo" placeholder="Ví dụ: so-thu-chi" />
         </div>
@@ -305,8 +301,6 @@
 
       // 1. Khởi tạo cấu hình và thiết lập thời gian địa phương
       document.addEventListener("DOMContentLoaded", () => {
-        document.getElementById("ghOwner").value =
-          localStorage.getItem("gh_owner") || "";
         document.getElementById("ghRepo").value =
           localStorage.getItem("gh_repo") || "";
         document.getElementById("ghToken").value =
@@ -325,10 +319,6 @@
       });
 
       function saveConfig() {
-        localStorage.setItem(
-          "gh_owner",
-          document.getElementById("ghOwner").value.trim(),
-        );
         localStorage.setItem(
           "gh_repo",
           document.getElementById("ghRepo").value.trim(),
@@ -366,15 +356,8 @@
       }
 
       // 3. Gọi GitHub API Upload File
-      async function uploadToGitHub(
-        path,
-        base64Content,
-        message,
-        token,
-        owner,
-        repo,
-      ) {
-        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+      async function uploadToGitHub(path, base64Content, message, token, repo) {
+        const url = `https://api.github.com/repos/CTXL1029/${repo}/contents/${path}`;
 
         let sha = null;
         try {
@@ -413,12 +396,11 @@
         .addEventListener("submit", async (e) => {
           e.preventDefault();
 
-          const owner = document.getElementById("ghOwner").value.trim();
           const repo = document.getElementById("ghRepo").value.trim();
           const token = document.getElementById("ghToken").value.trim();
 
-          if (!owner || !repo || !token) {
-            alert("Vui lòng điền đầy đủ cấu hình GitHub (Owner, Repo, Token)!");
+          if (!repo || !token) {
+            alert("Vui lòng điền đầy đủ cấu hình GitHub (Repo, Token)!");
             return;
           }
 
@@ -468,7 +450,6 @@
                 base64,
                 `Upload receipt #${id}`,
                 token,
-                owner,
                 repo,
               );
               receiptUrl = receiptPath;
@@ -486,7 +467,6 @@
                 base64,
                 `Upload doc #${id}`,
                 token,
-                owner,
                 repo,
               );
               pdfUrl = docPath;
@@ -494,7 +474,7 @@
 
             // BƯỚC 3: Cập nhật file js/data.js
             showStatus("info", "⏳ Đang lấy dữ liệu tệp js/data.js...");
-            const dataFileUrl = `https://api.github.com/repos/${owner}/${repo}/contents/js/data.js`;
+            const dataFileUrl = `https://api.github.com/repos/CTXL1029/${repo}/contents/js/data.js`;
             const dataRes = await fetch(dataFileUrl, {
               headers: { Authorization: `Bearer ${token}` },
             });
@@ -554,7 +534,6 @@
               newBase64,
               `Thêm giao dịch #${id}`,
               token,
-              owner,
               repo,
             );
 

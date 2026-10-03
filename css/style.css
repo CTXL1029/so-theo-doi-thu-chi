@@ -515,3 +515,43 @@ body {
 .btn-close-modal:hover {
   background: #0369a1;
 }
+
+/* --- NÚT NỔI CHUYỂN SANG TRANG ADMIN (thiết kế theo sample) --- */
+.admin-float-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 55px;
+  height: 55px;
+  color: black;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 1000;
+  text-decoration: none;
+  transition:
+    transform 0.2s,
+    background-color 0.2s;
+}
+
+/* Ẩn mặc định, chỉ hiện khi JS bỏ thuộc tính hidden */
+.admin-float-btn[hidden] {
+  display: none;
+}
+
+.admin-float-btn:hover {
+  transform: scale(1.1);
+  background-color: green;
+  color: #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 768px) {
+  .admin-float-btn {
+    bottom: 20px;
+    right: 20px;
+  }
+}

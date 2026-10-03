@@ -22,6 +22,20 @@ function initApp() {
   }
 
   // --------------------------------------------------------
+  // 1.5. Hiện nút sửa (bút chì) nếu máy đã lưu thông tin repo
+  // --------------------------------------------------------
+  const adminFloatBtn = document.getElementById("adminFloatBtn");
+  if (adminFloatBtn) {
+    try {
+      const hasRepo = (localStorage.getItem("gh_repo") || "").trim() !== "";
+      const hasToken = (localStorage.getItem("gh_token") || "").trim() !== "";
+      adminFloatBtn.hidden = !(hasRepo && hasToken);
+    } catch (e) {
+      adminFloatBtn.hidden = true; // localStorage bị chặn -> giữ ẩn
+    }
+  }
+
+  // --------------------------------------------------------
   // 2. Khai báo các phần tử DOM cho tính năng chính
   // --------------------------------------------------------
   const selectType = document.getElementById("select-type");
