@@ -1,5 +1,14 @@
 const transactionsData = [
   {
+    "id": "261014-002077804",
+    "type": "chi",
+    "datetime": "2026-10-14T12:21:00",
+    "title": "Trích quỹ mua quà 20/10",
+    "content": "Nhân dịp 20/10, các bạn nam trong lớp cùng nhau quyên góp mỗi người 70k để tặng cho các bạn nữ. Tuy nhiên sắp đến 20/10 mà chưa nhận được hết được phí từ các bạn nên tạm ứng quỹ lớp, các bạn nam sẽ góp lại và gửi lại sau.\nMỗi một set quà là 69k - lấy 70k để mua thêm kẹo\nhttps://vt.tiktok.com/ZS9UYWbADtRTf-ZjeO0/",
+    "amount": "1.400.000 VNĐ",
+    "receiptUrl": "assets/2026-10/proof/261014-002077804.png"
+  },
+  {
     "id": "261002-002087054",
     "type": "chi",
     "datetime": "2026-10-02T11:58:00",
