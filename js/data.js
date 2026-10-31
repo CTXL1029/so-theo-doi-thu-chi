@@ -4,7 +4,7 @@ const transactionsData = [
     "type": "chi",
     "datetime": "2026-10-31T16:59:00",
     "title": "Khoản chi cho đội STEM của lớp (1/2)",
-    "content": "Khoản chi cho hệ thống IOT của mô hình STEM - Cho hoạt động kỷ 60 năm của trường. Cụ thể trong phần văn bản chỉ đạo",
+    "content": "Khoản chi cho hệ thống IOT của mô hình STEM - Cho hoạt động kỷ 60 năm của trường. Cụ thể trong phần văn bản chỉ đạo. Lưu ý: Trang đầu tiên của file văn bản chỉ đạo là danh sách linh kiện được mua.",
     "amount": "205.000 VNĐ",
     "receiptUrl": "assets/2026-10/proof/261031-003472846.png",
     "pdfUrl": "assets/2026-10/doc/261031-003472846.pdf"
