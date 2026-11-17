@@ -1,5 +1,14 @@
 const transactionsData = [
   {
+    "id": "261118-000543425",
+    "type": "chi",
+    "datetime": "2026-11-18T06:44:00",
+    "title": "Khoản chi cho đội STEM của lớp (2/2)",
+    "content": "Khoản chi cho hệ thống IOT của mô hình STEM - Cho hoạt động kỷ 60 năm của trường (2/2). Cụ thể như sau:\n+) Đất sét, cọ: 20k + 20k + 20k\n+) Băng dính: 12k + 31k + 20k + 21k + 7k\n+) Màu: 20k + 35k\n+) Giấy decal: 120k\n+) Bật lửa: 5k\n+) Giấy màu: 21k\n+) Bìa cứng: 7k \nTổng: 359k",
+    "amount": "359.000 VNĐ",
+    "receiptUrl": "assets/2026-11/proof/261118-000543425.png"
+  },
+  {
     "id": "261117-005234252",
     "type": "thu",
     "datetime": "2026-11-17T21:13:00",
